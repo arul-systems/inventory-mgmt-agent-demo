@@ -8,6 +8,15 @@ interface ChatMessage {
   intent?: Intent
 }
 
+// crypto.randomUUID requires a secure context (HTTPS or localhost); the S3 site is
+// plain HTTP, so fall back to a non-cryptographic id, which is fine for a session key.
+function generateSessionId(): string {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+}
+
 const INTENT_LABELS: Record<Intent, string> = {
   inv_mgmt_agent: 'Inventory',
   item_transfer_agent: 'Transfer',
@@ -15,7 +24,7 @@ const INTENT_LABELS: Record<Intent, string> = {
 }
 
 export default function App() {
-  const [sessionId, setSessionId] = useState(() => crypto.randomUUID())
+  const [sessionId, setSessionId] = useState(() => generateSessionId())
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,7 +36,7 @@ export default function App() {
   }, [messages, loading])
 
   function newSession() {
-    const id = crypto.randomUUID()
+    const id = generateSessionId()
     activeSession.current = id
     setSessionId(id)
     setMessages([])
