@@ -1,4 +1,5 @@
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
@@ -43,7 +44,18 @@ def build_graph() -> CompiledStateGraph:
     graph.add_edge("summarizer", END)
     graph.add_edge("compactor", END)
 
-    return graph.compile(checkpointer=InMemorySaver())
+    serde = JsonPlusSerializer(
+        allowed_msgpack_modules=[
+            ("agent.model.intent", "Intent"),
+            ("agent.model.item", "Item"),
+            ("agent.model.inv_mgmt", "InvMgmtResponse"),
+            ("agent.model.transfer", "ItemTransferResponse"),
+            ("agent.model.transfer", "Transfer"),
+            ("agent.model.purchase_order", "VendorResponse"),
+            ("agent.model.purchase_order", "PurchaseOrder"),
+        ]
+    )
+    return graph.compile(checkpointer=InMemorySaver(serde=serde))
 
 
 agent = build_graph()

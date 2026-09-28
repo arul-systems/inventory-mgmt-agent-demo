@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from agent.model import Intent
+
 
 class ChatRequest(BaseModel):
     """Incoming request to the chat endpoint."""
@@ -12,4 +14,5 @@ class ChatResponse(BaseModel):
     """Final, user-facing response for a chat turn."""
 
     session_id: str
+    intent: Intent = Field(description="The intent the planner identified and routed this message to.")
     message: str
