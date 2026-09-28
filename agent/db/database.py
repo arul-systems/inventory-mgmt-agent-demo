@@ -1,8 +1,10 @@
+import os
+import re
 import sqlite3
 from pathlib import Path
 from typing import Optional
 
-DB_PATH = Path(__file__).parent / "inventory.db"
+DB_PATH = Path(os.environ.get("INVENTORY_DB_PATH", Path(__file__).parent / "inventory.db"))
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS vendors (
@@ -72,8 +74,18 @@ def get_connection() -> sqlite3.Connection:
     return conn
 
 
+def schema_exists() -> bool:
+    """Return True if every table defined in SCHEMA is already present."""
+    expected = set(re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)", SCHEMA))
+    with get_connection() as conn:
+        rows = conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
+    return expected <= {row["name"] for row in rows}
+
+
 def init_db() -> None:
-    """Create the database schema if it doesn't already exist."""
+    """Create the database schema, skipping it if all tables already exist."""
+    if schema_exists():
+        return
     with get_connection() as conn:
         conn.executescript(SCHEMA)
 

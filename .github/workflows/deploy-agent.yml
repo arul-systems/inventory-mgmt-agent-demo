@@ -1,0 +1,47 @@
+name: Deploy agent
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agent/**"
+
+concurrency:
+  group: deploy-agent
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  AWS_DEFAULT_REGION: us-east-2
+  FUNCTION_NAME: inventory-mgmt-agent
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Build Lambda package
+        run: |
+          uv export --no-dev --no-hashes --frozen --no-emit-project -o requirements.txt
+          uv pip install -r requirements.txt \
+            --target build/package \
+            --python-platform x86_64-manylinux_2_28 \
+            --python-version 3.12 \
+            --only-binary :all:
+          cp -r agent build/package/
+          cd build/package
+          zip -qr ../agent.zip . -x "*/__pycache__/*" -x "*.db"
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name "$FUNCTION_NAME" \
+            --zip-file fileb://build/agent.zip
+          aws lambda wait function-updated --function-name "$FUNCTION_NAME"

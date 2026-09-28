@@ -1,0 +1,8 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.hcl
+
+crash.log
+placeholder.zip
