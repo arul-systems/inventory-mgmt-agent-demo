@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "agent/**"
+      - ".github/workflows/deploy-agent.yml"
 
 concurrency:
   group: deploy-agent
@@ -38,6 +39,7 @@ jobs:
           cp -r agent build/package/
           cd build/package
           zip -qr ../agent.zip . -x "*/__pycache__/*" -x "*.db"
+          
 
       - name: Deploy to Lambda
         env:
