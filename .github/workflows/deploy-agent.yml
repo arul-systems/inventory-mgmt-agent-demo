@@ -40,6 +40,9 @@ jobs:
           zip -qr ../agent.zip . -x "*/__pycache__/*" -x "*.db"
 
       - name: Deploy to Lambda
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           aws lambda update-function-code \
             --function-name "$FUNCTION_NAME" \
