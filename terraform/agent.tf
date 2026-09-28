@@ -46,29 +46,3 @@ resource "aws_lambda_function" "agent" {
   }
 }
 
-resource "aws_lambda_function_url" "agent" {
-  function_name      = aws_lambda_function.agent.function_name
-  authorization_type = "NONE"
-
-  cors {
-    allow_origins = [
-      "http://localhost:5173",
-      "http://${aws_s3_bucket_website_configuration.ui.website_endpoint}",
-    ]
-    allow_methods = ["POST"]
-    allow_headers = ["content-type"]
-  }
-}
-
-resource "aws_lambda_permission" "public_function_url" {
-  statement_id           = "AllowPublicFunctionUrl"
-  action                 = "lambda:InvokeFunctionUrl"
-  function_name          = aws_lambda_function.agent.function_name
-  principal              = "*"
-  function_url_auth_type = "NONE"
-}
-
-output "agent_url" {
-  description = "HTTPS endpoint of the agent (POST /chat)."
-  value       = aws_lambda_function_url.agent.function_url
-}
