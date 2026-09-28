@@ -33,6 +33,12 @@ resource "aws_lambda_function" "agent" {
     variables = {
       OPENAI_API_KEY    = var.openai_api_key
       INVENTORY_DB_PATH = "/tmp/inventory.db"
+
+      # LangSmith tracing is built into langchain/langgraph; it activates purely from
+      # these env vars, with no code changes needed. Tracing is off if the key is empty.
+      LANGSMITH_TRACING = var.langsmith_api_key != "" ? "true" : "false"
+      LANGSMITH_API_KEY = var.langsmith_api_key
+      LANGSMITH_PROJECT = "agent-demo"
     }
   }
 
