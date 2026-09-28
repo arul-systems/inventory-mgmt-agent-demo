@@ -21,16 +21,25 @@ def _response(status: int, body: dict) -> dict:
 
 
 def handler(event, context):
-    """Lambda function URL entry point: expects a JSON body with `session_id` and `text`."""
-    raw = event.get("body") or ""
-    if event.get("isBase64Encoded"):
-        raw = base64.b64decode(raw).decode("utf-8")
+    """Lambda entry point: expects `session_id` and `text`, either at the top level
+    (e.g. a console test event) or JSON-encoded in `body` (a function URL request).
+    """
+    if "body" in event:
+        raw = event.get("body") or ""
+        if event.get("isBase64Encoded"):
+            raw = base64.b64decode(raw).decode("utf-8")
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError:
+            return _response(400, {"error": "Body must be JSON with string fields 'session_id' and 'text'."})
+    else:
+        payload = event
+
     try:
-        payload = json.loads(raw)
         session_id, text = payload["session_id"], payload["text"]
         if not isinstance(session_id, str) or not isinstance(text, str):
             raise TypeError
-    except (json.JSONDecodeError, KeyError, TypeError):
+    except (KeyError, TypeError):
         return _response(400, {"error": "Body must be JSON with string fields 'session_id' and 'text'."})
 
     state = agent.invoke(
