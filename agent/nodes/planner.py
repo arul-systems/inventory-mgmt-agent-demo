@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from langchain_openai import ChatOpenAI
+from langchain_aws import ChatBedrockConverse
 
 from agent.model import AgentState, IntentClassification
 from agent.nodes.context import messages_with_summary
@@ -14,7 +14,7 @@ Use earlier messages to resolve references such as "it" or "that item"."""
 
 @lru_cache(maxsize=1)
 def _get_classifier():
-    return ChatOpenAI(model="gpt-4.1-mini", temperature=0).with_structured_output(
+    return ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0).with_structured_output(
         IntentClassification
     )
 

@@ -3,8 +3,8 @@ from functools import lru_cache
 from typing import Optional, Union
 
 from langchain.agents import create_agent
+from langchain_aws import ChatBedrockConverse
 from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
 
 from agent.db.database import create_item, delete_item, get_item, update_item
 from agent.model import AgentState, InvMgmtResponse, Item
@@ -71,7 +71,7 @@ Guidelines:
 
 @lru_cache(maxsize=1)
 def _get_agent():
-    llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
+    llm = ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0)
     return create_agent(
         llm, TOOLS, system_prompt=SYSTEM_PROMPT, response_format=InvMgmtResponse
     )

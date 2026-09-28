@@ -1,7 +1,7 @@
 from functools import lru_cache
 
+from langchain_aws import ChatBedrockConverse
 from langchain_core.messages import AIMessage
-from langchain_openai import ChatOpenAI
 
 from agent.model import AgentState
 from agent.nodes.context import messages_with_summary
@@ -15,7 +15,7 @@ Use the conversation for context, but do not invent facts beyond what is given t
 
 @lru_cache(maxsize=1)
 def _get_llm():
-    return ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    return ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0)
 
 
 def summarizer(state: AgentState) -> AgentState:

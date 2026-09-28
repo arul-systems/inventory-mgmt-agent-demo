@@ -1,9 +1,9 @@
 import logging
 from functools import lru_cache
 
+from langchain_aws import ChatBedrockConverse
 from langchain_core.messages import HumanMessage, RemoveMessage
 from langchain_core.messages.utils import count_tokens_approximately, trim_messages
-from langchain_openai import ChatOpenAI
 
 from agent.model import AgentState
 
@@ -14,7 +14,7 @@ MAX_TOKENS = 300
 
 @lru_cache(maxsize=1)
 def _get_llm():
-    return ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    return ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0)
 
 
 def _generate_summary(state: AgentState, removed_messages: list) -> str:

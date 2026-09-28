@@ -2,8 +2,8 @@ from functools import lru_cache
 from typing import Union
 
 from langchain.agents import create_agent
+from langchain_aws import ChatBedrockConverse
 from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
 
 from agent.db.database import list_locations, transfer_item
 from agent.model import AgentState, Item, ItemTransferResponse, Transfer, TransferResult
@@ -40,7 +40,7 @@ Guidelines:
 
 @lru_cache(maxsize=1)
 def _get_agent():
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0)
     return create_agent(
         llm, TOOLS, system_prompt=SYSTEM_PROMPT, response_format=ItemTransferResponse
     )
