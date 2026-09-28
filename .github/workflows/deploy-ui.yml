@@ -1,0 +1,46 @@
+name: Deploy agent-ui
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agent-ui/**"
+      - ".github/workflows/deploy-ui.yml"
+
+concurrency:
+  group: deploy-ui
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  AWS_DEFAULT_REGION: us-east-2
+  BUCKET_NAME: inventory-mgmt-agent-ui
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent-ui
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: npm run build
+
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: aws s3 sync dist/ "s3://$BUCKET_NAME" --delete

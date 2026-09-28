@@ -6,8 +6,12 @@ export interface ChatResponse {
   message: string
 }
 
+// In dev, Vite proxies /chat to the local API. In production (e.g. served from S3),
+// set VITE_API_URL to the deployed Lambda function URL at build time.
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
+
 export async function sendMessage(sessionId: string, text: string): Promise<ChatResponse> {
-  const res = await fetch('/chat', {
+  const res = await fetch(`${API_BASE}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ session_id: sessionId, text }),
