@@ -14,7 +14,7 @@ MAX_TOKENS = 300
 
 @lru_cache(maxsize=1)
 def _get_llm():
-    return ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0)
+    return ChatBedrockConverse(model="us.anthropic.claude-haiku-4-5-20251001-v1:0", region_name="us-east-2", temperature=0)
 
 
 def _generate_summary(state: AgentState, removed_messages: list) -> str:

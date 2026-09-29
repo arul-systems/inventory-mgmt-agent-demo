@@ -1,0 +1,78 @@
+# Architecture diagram for the inventory management agent demo.
+#
+# Render with: d2 docs/architecture.d2 docs/architecture.svg
+#
+# Icons are pulled from https://icons.terrastruct.com (Terrastruct's hosted mirror of the
+# AWS Architecture Icons set). That mirror predates Amazon Bedrock, so there's no official
+# Bedrock icon available — the Bedrock node below is a plain labeled box rather than a
+# faked/incorrect icon.
+
+direction: right
+
+user: "User\n(browser)" {
+  icon: https://icons.terrastruct.com/tech/browser-2.svg
+  shape: image
+}
+
+github: "GitHub Actions\n(CI/CD)" {
+  icon: https://icons.terrastruct.com/dev/github.svg
+  shape: image
+}
+
+langsmith: "LangSmith\n(tracing, optional)" {
+  shape: rectangle
+  style.stroke-dash: 3
+}
+
+aws: "AWS — us-east-2" {
+  style.stroke: "#FF9900"
+  style.stroke-width: 2
+
+  s3: "Amazon S3\nagent-ui (static website)" {
+    icon: https://icons.terrastruct.com/aws/Storage/Amazon-Simple-Storage-Service-S3_Bucket-with-Objects_light-bg.svg
+    shape: image
+  }
+
+  apigw: "Amazon API Gateway\nHTTP API — POST /chat" {
+    icon: https://icons.terrastruct.com/aws/Networking%20&%20Content%20Delivery/Amazon-API-Gateway.svg
+    shape: image
+  }
+
+  lambda: "AWS Lambda\nagent/lambda.py" {
+    icon: https://icons.terrastruct.com/aws/Compute/AWS-Lambda.svg
+
+    sqlite: "SQLite\n/tmp (ephemeral)" {
+      shape: cylinder
+    }
+  }
+
+  bedrock: "Amazon Bedrock\nclaude-sonnet-4-5 / claude-haiku-4-5" {
+    shape: rectangle
+  }
+
+  iam: "IAM Role\nbedrock:InvokeModel*" {
+    icon: https://icons.terrastruct.com/aws/Security%2C%20Identity%2C%20&%20Compliance/AWS-Identify-and-Access-Management_IAM.svg
+    shape: image
+  }
+
+  cloudwatch: "Amazon CloudWatch\nLogs" {
+    icon: https://icons.terrastruct.com/aws/Management%20&%20Governance/Amazon-CloudWatch.svg
+    shape: image
+  }
+
+  iam -> lambda: "execution role" {
+    style.stroke-dash: 3
+  }
+}
+
+user -> aws.s3: "loads UI"
+user -> aws.apigw: "POST /chat"
+aws.apigw -> aws.lambda: "invoke"
+aws.lambda -> aws.bedrock: "Converse API\n(per-node model choice)"
+aws.lambda -> aws.cloudwatch: "logs"
+aws.lambda -> langsmith: "traces" {
+  style.stroke-dash: 3
+}
+
+github -> aws.lambda: "deploy code\n(update-function-code)"
+github -> aws.s3: "deploy build\n(s3 sync)"

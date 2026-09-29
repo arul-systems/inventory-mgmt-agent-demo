@@ -15,7 +15,7 @@ Use the conversation for context, but do not invent facts beyond what is given t
 
 @lru_cache(maxsize=1)
 def _get_llm():
-    return ChatBedrockConverse(model="us.anthropic.claude-sonnet-4-5-20250929-v1:0", region_name="us-east-2", temperature=0)
+    return ChatBedrockConverse(model="us.anthropic.claude-haiku-4-5-20251001-v1:0", region_name="us-east-2", temperature=0)
 
 
 def summarizer(state: AgentState) -> AgentState:
