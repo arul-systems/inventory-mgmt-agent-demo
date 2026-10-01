@@ -28,7 +28,12 @@ aws: "AWS — us-east-2" {
   style.stroke: "#FF9900"
   style.stroke-width: 2
 
-  s3: "Amazon S3\nagent-ui (static website)" {
+  cloudfront: "Amazon CloudFront\nCDN (HTTPS)" {
+    icon: https://icons.terrastruct.com/aws/Networking%20&%20Content%20Delivery/Amazon-CloudFront.svg
+    shape: image
+  }
+
+  s3: "Amazon S3\nagent-ui (private origin)" {
     icon: https://icons.terrastruct.com/aws/Storage/Amazon-Simple-Storage-Service-S3_Bucket-with-Objects_light-bg.svg
     shape: image
   }
@@ -60,12 +65,14 @@ aws: "AWS — us-east-2" {
     shape: image
   }
 
+  cloudfront -> s3: "origin access\ncontrol (OAC)"
+
   iam -> lambda: "execution role" {
     style.stroke-dash: 3
   }
 }
 
-user -> aws.s3: "loads UI"
+user -> aws.cloudfront: "loads UI"
 user -> aws.apigw: "POST /chat"
 aws.apigw -> aws.lambda: "invoke"
 aws.lambda -> aws.bedrock: "Converse API\n(per-node model choice)"
@@ -76,3 +83,6 @@ aws.lambda -> langsmith: "traces" {
 
 github -> aws.lambda: "deploy code\n(update-function-code)"
 github -> aws.s3: "deploy build\n(s3 sync)"
+github -> aws.cloudfront: "invalidate cache" {
+  style.stroke-dash: 3
+}

@@ -5,7 +5,7 @@ resource "aws_apigatewayv2_api" "agent" {
   cors_configuration {
     allow_origins = [
       "http://localhost:5173",
-      "http://${aws_s3_bucket_website_configuration.ui.website_endpoint}",
+      "https://${aws_cloudfront_distribution.ui.domain_name}",
     ]
     allow_methods = ["POST"]
     allow_headers = ["content-type"]

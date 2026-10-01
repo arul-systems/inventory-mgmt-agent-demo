@@ -38,7 +38,7 @@ def build_graph() -> CompiledStateGraph:
             Intent.VENDOR_AGENT: Intent.VENDOR_AGENT.value,
         },
     )
-    
+
     graph.add_edge(Intent.INV_MGMT_AGENT.value, "summarizer")
     graph.add_edge(Intent.ITEM_TRANSFER_AGENT.value, "summarizer")
     graph.add_edge(Intent.VENDOR_AGENT.value, "summarizer")
