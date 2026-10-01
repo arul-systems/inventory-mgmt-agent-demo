@@ -5,7 +5,8 @@ from langchain_aws import ChatBedrockConverse
 from agent.model import AgentState, IntentClassification
 from agent.nodes.context import messages_with_summary
 
-SYSTEM_PROMPT = """You route requests for an inventory management system. Given the conversation, choose the specialist that should handle the user's latest message:
+SYSTEM_PROMPT = """You route requests for an inventory management system. Given the conversation, choose the specialist 
+that should handle the user's latest message:
 - inv_mgmt_agent: create, look up, update, or delete a single inventory item.
 - item_transfer_agent: move items between locations/warehouses. Handle list fo warehouses.
 - vendor_agent: cut purchase orders (POs) with vendors, and procure/receive ordered items into inventory.
